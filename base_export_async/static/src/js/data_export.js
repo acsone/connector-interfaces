@@ -12,9 +12,8 @@ odoo.define('base_export_async.DataExport', function (require) {
 
     DataExport.include({
         start: function() {
-            var self = this;
             this._super.apply(this, arguments);
-            self.async = self.$('#async_export');
+            this.async = this.$('#async_export');
         },
         export_data: function() {
             var self = this;
@@ -54,7 +53,7 @@ odoo.define('base_export_async.DataExport', function (require) {
                     ],
                 }).then(function (result) {
                     framework.unblockUI();
-                    Dialog.alert(this, _t("As you are in asynchronous mode, you will receive the export file by email."));
+                    Dialog.alert(this, _t("You will receive the export file by email as soon as it is finished."));
                 });
             } else {
                 this._super.apply(this, arguments);
