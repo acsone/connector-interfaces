@@ -5,7 +5,8 @@
     <t t-jquery="div.row" t-operation="append">
         <div class="col-lg-12">
             <label>
-                <input type="checkbox" name="async_export" id="async_export"/> <strong> Asynchronous export </strong> (You will receive the export by email)
+                <input type="checkbox" name="async_export" id="async_export"/>
+                <strong> Asynchronous export </strong> (You will receive the export by email)
             </label>
         </div>
     </t>

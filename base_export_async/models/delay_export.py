@@ -31,7 +31,7 @@ class DelayExport(models.Model):
             raise Warning(_("You must set an email address to your user."))
         self.with_delay().export(params)
 
-    @api.multi
+    @api.model
     @job
     def export(self, params):
         export_format = params.get('format')

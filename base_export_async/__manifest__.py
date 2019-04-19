@@ -4,13 +4,15 @@
 {
     'name': 'Base Export Async',
     'summary': """
-        Asynchronous export with job queue""",
+        Asynchronous export with job queue
+        """,
     'version': '12.0.1.0.0',
     'license': 'AGPL-3',
     'author': 'ACSONE SA/NV, Odoo Community Association (OCA)',
     'website': 'https://acsone.eu/',
     'depends': [
         'web',
+        'queue_job'
     ],
     'data': [
         'views/assets.xml',

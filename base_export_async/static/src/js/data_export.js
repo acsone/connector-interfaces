@@ -1,13 +1,11 @@
 odoo.define('base_export_async.DataExport', function (require) {
 "use strict";
 
-
     var core = require('web.core');
     var DataExport = require('web.DataExport');
     var framework = require('web.framework');
     var pyUtils = require('web.py_utils');
     var Dialog = require('web.Dialog');
-
     var _t = core._t;
 
     DataExport.include({
