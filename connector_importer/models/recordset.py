@@ -97,7 +97,7 @@ class ImportRecordset(models.Model, JobRelatedMixin):
         return self.env["import.record"].search([("recordset_id", "=", self.id)])
 
     def _set_serialized(self, fname, values, reset=False):
-        """Update seriazed data."""
+        """Update serialized data."""
         _values = {}
         if not reset:
             _values = self[fname]
@@ -132,6 +132,22 @@ class ImportRecordset(models.Model, JobRelatedMixin):
         self.ensure_one()
         return self.shared_data or {}
 
+    def _prepare_for_import_session(self, start=True):
+        """Wipe all session related data.
+        """
+        report_data = {}
+        if start:
+            report_data["_last_start"] = fields.Datetime.to_string(
+                fields.Datetime.now()
+            )
+        values = {
+            "record_ids": [(5, 0, 0)],
+            "report_data": report_data,
+            "shared_data": {},
+        }
+        self.write(values)
+        self.invalidate_cache(tuple(values.keys()))
+
     def _get_report_html_data(self):
         """Prepare data for HTML report.
 
@@ -157,13 +173,12 @@ class ImportRecordset(models.Model, JobRelatedMixin):
             "report_by_model": OrderedDict(),
         }
         # count keys by model
-        for item in self.available_models():
-            _model = item[0]
-            model = self.env["ir.model"]._get(_model)
+        for config in self.available_importers():
+            model = self.env["ir.model"]._get(config.model)
             data["report_by_model"][model] = {}
             # be defensive here. At some point
             # we could decide to skip models on demand.
-            for k, v in report.get(_model, {}).items():
+            for k, v in report.get(config.model, {}).items():
                 data["report_by_model"][model][k] = len(v)
         return data
 
@@ -204,8 +219,8 @@ class ImportRecordset(models.Model, JobRelatedMixin):
                 break
         return res
 
-    def available_models(self):
-        return self.import_type_id.available_models()
+    def available_importers(self):
+        return self.import_type_id.available_importers()
 
     @job(default_channel="root.connector_importer")
     def import_recordset(self):
@@ -264,11 +279,11 @@ class ImportRecordset(models.Model, JobRelatedMixin):
 
     def _get_importers(self):
         importers = OrderedDict()
-        for model_name, importer, __ in self.available_models():
-            model = self.env["ir.model"]._get(model_name)
+        for config in self.available_importers():
+            model = self.env["ir.model"]._get(config.model)
             with self.backend_id.work_on(self._name) as work:
                 importers[model] = work.component_by_name(
-                    importer, model_name=model_name
+                    config.importer, model_name=config.model
                 )
         return importers
 
