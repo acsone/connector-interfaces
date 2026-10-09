@@ -10,7 +10,7 @@ import requests
 
 from odoo import Command, api, fields, models
 
-from ...exceptions.exceptions import InvalidAPIData
+from ...exceptions.exceptions import APIRequestError, InvalidAPIData
 
 
 class ImportSourceApi(models.Model):
@@ -277,14 +277,18 @@ class ImportSourceApi(models.Model):
                 headers=headers,
                 stream=self.stream,
                 timeout=self.timeout,
-            ) as results:
-                for result in results.iter_lines():
+            ) as response:
+                if response.status_code != 200:
+                    raise APIRequestError(self.env, response)
+                for result in response.iter_lines():
                     result_data = json.loads(result)
                     yield result_data
         else:
             response = requests.post(
                 url, data=data, params=params, headers=headers, timeout=self.timeout
             )
+            if response.status_code != 200:
+                raise APIRequestError(self.env, response)
             result_data = response.json()
             yield result_data
 
