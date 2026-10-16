@@ -16,6 +16,7 @@
                     <field name="url" />
                     <field name="timeout" />
                     <field name="type_authorization" />
+                    <field name="chunk_size" />
                     <field
                         name="username"
                         invisible="type_authorization != 'basic_auth'"
